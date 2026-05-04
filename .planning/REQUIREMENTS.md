@@ -7,33 +7,33 @@
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can log in with username and password
-- [ ] **AUTH-02**: Session persists via JWT cookie across browser refresh
+- [x] **AUTH-01**: User can log in with username and password
+- [x] **AUTH-02**: Session persists via JWT cookie across browser refresh
 - [ ] **AUTH-03**: Protected routes redirect to /login when not authenticated
-- [ ] **AUTH-04**: System supports two roles: admin and editor
+- [x] **AUTH-04**: System supports two roles: admin and editor
 
 ### Incidents
 
-- [ ] **INC-01**: User can create incident with title, description, priority, category, tags
-- [ ] **INC-02**: User can upload text, PDF, or DOCX file and extract its text into description
-- [ ] **INC-03**: Incident is saved as Draft status by default
-- [ ] **INC-04**: User can update incident fields when status is Draft
-- [ ] **INC-05**: User can transition status Draft → Reviewed → Published
-- [ ] **INC-06**: Published incidents are locked (no further edits)
-- [ ] **INC-07**: Each status change is logged in version history with timestamp and user
-- [ ] **INC-08**: Admin can delete Draft incidents
+- [x] **INC-01**: User can create incident with title, description, priority, category, tags
+- [x] **INC-02**: User can upload text, PDF, or DOCX file and extract its text into description
+- [x] **INC-03**: Incident is saved as Draft status by default
+- [x] **INC-04**: User can update incident fields when status is Draft
+- [x] **INC-05**: User can transition status Draft → Reviewed → Published
+- [x] **INC-06**: Published incidents are locked (no further edits)
+- [x] **INC-07**: Each status change is logged in version history with timestamp and user
+- [x] **INC-08**: Admin can delete Draft incidents
 
 ### Viewer
 
-- [ ] **VIEW-01**: User can view paginated list of all incidents (20 per page)
-- [ ] **VIEW-02**: User can filter incidents by status, tag, date range, creator
-- [ ] **VIEW-03**: User can search incidents by keyword (title + description)
-- [ ] **VIEW-04**: Incident detail page shows all fields, files, version history in tabs
+- [x] **VIEW-01**: User can view paginated list of all incidents (20 per page)
+- [x] **VIEW-02**: User can filter incidents by status, tag, date range, creator
+- [x] **VIEW-03**: User can search incidents by keyword (title + description)
+- [x] **VIEW-04**: Incident detail page shows all fields, files, version history in tabs
 
 ### Dashboard
 
-- [ ] **DASH-01**: Dashboard shows total incident counts by status (Draft/Reviewed/Published)
-- [ ] **DASH-02**: Dashboard shows 10 most recent incidents
+- [x] **DASH-01**: Dashboard shows total incident counts by status (Draft/Reviewed/Published)
+- [x] **DASH-02**: Dashboard shows 10 most recent incidents
 
 ### RPA
 
@@ -47,11 +47,11 @@
 
 ### API
 
-- [ ] **API-01**: All API endpoints require valid JWT (except /api/auth/login)
-- [ ] **API-02**: POST /api/files/extract accepts file upload and returns extracted text
-- [ ] **API-03**: POST /api/incidents/check-duplicate returns is_duplicate + existing_incident_id
-- [ ] **API-04**: GET /api/reports/summary returns totals by status, priority, category
-- [ ] **API-05**: All responses follow {success, data, message} envelope
+- [x] **API-01**: All API endpoints require valid JWT (except /api/auth/login)
+- [x] **API-02**: POST /api/files/extract accepts file upload and returns extracted text
+- [x] **API-03**: POST /api/incidents/check-duplicate returns is_duplicate + existing_incident_id
+- [x] **API-04**: GET /api/reports/summary returns totals by status, priority, category
+- [x] **API-05**: All responses follow {success, data, message} envelope
 
 ### AI (Claude — Phase 2)
 
