@@ -31,9 +31,9 @@
 5. Click "Publish" → status locked, no edit button shown
 6. All 7 API endpoints respond correctly with {success, data} envelope (verifiable via /docs)
 
-**Plans:**
-- `01-01-PLAN.md` — Backend: scaffolding, auth, incidents CRUD, file extraction, reports/logs
-- `01-02-PLAN.md` — Frontend: login, dashboard, upload console, incident viewer, incident detail
+**Plans:** 2 plans
+- [ ] `01-01-PLAN.md` — Backend: scaffolding, JWT auth, incidents CRUD, file extraction, reports/logs (Wave 1)
+- [ ] `01-02-PLAN.md` — Frontend: login, dashboard, upload console, incident viewer, incident detail (Wave 2)
 
 ---
 
