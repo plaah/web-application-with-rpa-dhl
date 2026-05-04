@@ -56,15 +56,15 @@ Exceptions:
 | Body | 14px | 400 | 1.5 | Table cell text, form labels, description text |
 | Label | 12px | 600 | 1.4 | Status badges, table column headers, tag chips, nav items |
 | Heading | 20px | 600 | 1.3 | Page titles, card section headings, modal titles |
-| Display | 28px | 700 | 1.2 | Dashboard stat numbers (incident counts), login page title |
+| Display | 28px | 600 | 1.2 | Dashboard stat numbers (incident counts), login page title |
 
-All text uses Inter (next/font/google). No additional weights beyond 400 and 600/700.
+All text uses Inter (next/font/google). Two weights only: 400 (normal) and 600 (semibold).
 
 **Mapping to Tailwind classes:**
 - Body: `text-sm font-normal leading-relaxed` (14px / 400 / 1.5)
 - Label: `text-xs font-semibold leading-snug` (12px / 600 / 1.4)
 - Heading: `text-xl font-semibold leading-snug` (20px / 600 / 1.3)
-- Display: `text-3xl font-bold leading-tight` (28px+/ 700 / 1.2) — use `text-4xl` for stat numbers on dashboard
+- Display: `text-3xl font-semibold leading-tight` (28px / 600 / 1.2)
 
 ---
 
@@ -127,27 +127,32 @@ Components required by this phase (hand-rolled with Tailwind):
 - Centered card, 400px wide max, vertically centered on full-height page
 - DHL Red header band at top with logo
 - Username + password inputs stacked, "Sign In" CTA full-width
+- Primary focal point: "Sign In" CTA button (full-width, accent red, bottom of card)
 
 ### /dashboard
 - Top: 3 StatCards side by side (Draft / Reviewed / Published counts)
 - Below: "Recent Incidents" table, last 10, no pagination
 - Right sidebar: NOT required (keep single column, 960px max content width)
+- Primary focal point: 3 StatCard numbers (Display size, top of page, above the fold)
 
 ### /upload
 - Left column (60%): FileDropzone + extracted text preview textarea
 - Right column (40%): IncidentForm (title, description pre-filled from extract, priority, category, tags)
 - Single "Save Incident" CTA at bottom of form
+- Primary focal point: FileDropzone (left column, top — first user action in the workflow)
 
 ### /incidents
 - FilterBar at top (full width)
 - IncidentTable below
 - PaginationBar at bottom right
+- Primary focal point: IncidentTable (full-width, dominant content area below FilterBar)
 
 ### /incidents/[id]
 - Breadcrumb: Dashboard > Incidents > {title}
 - Title + StatusBadge + status action button row
 - TabStrip: Details | Files | History
 - Tab content below
+- Primary focal point: Status action button row (title + badge + CTA — top of content, drives next user action)
 
 ---
 
