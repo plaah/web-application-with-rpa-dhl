@@ -14,19 +14,20 @@ Every incident submitted (manually or via RPA) reaches a "Published" status with
 
 ### Validated
 
-(None yet — ship to validate)
+*Validated in Phase 1: Web Application (2026-05-05)*
+
+- [x] Secured login (JWT, roles: admin/editor/rpa_bot)
+- [x] Upload Console accepting text, PDF, DOCX files with text extraction
+- [x] Incident CRUD via REST API (JSON storage)
+- [x] Draft → Reviewed → Published status workflow with version history
+- [x] Searchable/filterable incident viewer (status, tag, date, creator, keyword)
+- [x] Dashboard with incident counts and recent activity
 
 ### Active
 
-- [ ] Secured login (JWT, roles: admin/editor)
-- [ ] Upload Console accepting text, PDF, DOCX files with text extraction
-- [ ] Incident CRUD via REST API (JSON storage)
-- [ ] Draft → Reviewed → Published status workflow with version history
-- [ ] Searchable/filterable incident viewer (status, tag, date, creator, keyword)
 - [ ] UiPath RPA bot: Google Drive ingestion → dedup → API create/update → summary email
-- [ ] Claude AI: text summarization, tag extraction, image text extraction (Phase 2)
-- [ ] Dashboard with incident counts and recent activity
 - [ ] RPA error handling: Try/Catch + screenshot + log
+- [ ] Claude AI: text summarization, tag extraction, image text extraction (Phase 3)
 
 ### Out of Scope
 
@@ -56,11 +57,14 @@ Every incident submitted (manually or via RPA) reaches a "Published" status with
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| JSON + FastAPI over SQL/MongoDB | Assignment allows it; simpler setup; no DB install for evaluator | — Pending |
-| FastAPI over Flask | Auto Swagger docs at /docs great for CRUD demo; better async file handling | — Pending |
-| Claude API over GPT | User preference | — Pending |
-| Next.js App Router | React-based, easy API calls, SSR support | — Pending |
-| JWT in httpOnly cookie | Stateless, RPA-compatible via Bearer header | — Pending |
+| JSON + FastAPI over SQL/MongoDB | Assignment allows it; simpler setup; no DB install for evaluator | ✓ Validated — filelock prevents corruption |
+| FastAPI over Flask | Auto Swagger docs at /docs great for CRUD demo; better async file handling | ✓ Validated — /docs works out of the box |
+| Claude API over GPT | User preference | — Phase 3 |
+| Next.js App Router | React-based, easy API calls, SSR support | ✓ Validated — middleware auth guards work well |
+| JWT in cookie (not httpOnly) | RPA-compatible via Bearer header; middleware reads cookie server-side | ✓ Validated — irrs_token + irrs_user cookies, 8h TTL |
+| HTTPBearer(auto_error=False) | FastAPI default returns 403 on missing token; assignment requires 401 | ✓ Validated — explicit 401 in get_current_user |
 
 ---
-*Last updated: 2026-05-04 after initialization from PRD*
+**Current state:** Phase 1 complete — full web application live (FastAPI + Next.js). Phase 2 (RPA) next.
+
+*Last updated: 2026-05-05 after Phase 1 completion*
