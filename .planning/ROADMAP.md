@@ -50,8 +50,9 @@
 4. Admin receives summary email: "Created: 3, Duplicates: 1, Failed: 0"
 5. All RPA actions visible in Logs page of web app
 
-**Plans:**
-- `02-01-PLAN.md` — UiPath: Drive monitor, hash dedup, API auth + create + status update, error handling, email
+**Plans:** 2 plans
+- [ ] `02-01-PLAN.md` — UiPath bot: Drive watch folder, SHA-256 dedup, multipart incident create, status PATCH, per-file Try/Catch + screenshot, summary email (Wave 1)
+- [ ] `02-02-PLAN.md` — Frontend: /logs page (grouped collapsible runs), LogEntry types, Navbar /logs unguard (Wave 1)
 
 ---
 
