@@ -11,7 +11,7 @@
 | # | Phase | Goal | Requirements | Days | Status |
 |---|-------|------|--------------|------|--------|
 | 1 | 2/2 | Complete   | 2026-05-05 | Days 1–5 (May 4–8) | ◑ In Progress (1/2) |
-| 2 | RPA Automation | UiPath bot ingests Drive files, deduplicates, creates/updates incidents via API, sends email | RPA-01–07 | Days 6–8 (May 9–11) | ○ Pending |
+| 2 | 1/2 | In Progress|  | Days 6–8 (May 9–11) | ○ Pending |
 | 3 | AI Enhancement | Claude API integration for text summarization, tag extraction, image OCR | AI-01–03 | Days 9–10 (May 12–13) | ○ Pending |
 | 4 | Polish & Submit | Seed data, README, demo video, report, submission | All | Days 11–15 (May 13–15) | ○ Pending |
 
@@ -50,7 +50,7 @@
 4. Admin receives summary email: "Created: 3, Duplicates: 1, Failed: 0"
 5. All RPA actions visible in Logs page of web app
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 - [ ] `02-01-PLAN.md` — UiPath bot: Drive watch folder, SHA-256 dedup, multipart incident create, status PATCH, per-file Try/Catch + screenshot, summary email (Wave 1)
 - [ ] `02-02-PLAN.md` — Frontend: /logs page (grouped collapsible runs), LogEntry types, Navbar /logs unguard (Wave 1)
 

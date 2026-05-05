@@ -41,7 +41,7 @@
 - [ ] **RPA-02**: Bot skips files with same SHA-256 hash seen within last 14 days
 - [ ] **RPA-03**: Bot creates incident via POST /api/incidents with file attached
 - [ ] **RPA-04**: Bot updates incident status to Reviewed via PATCH /api/incidents/{id}/status
-- [ ] **RPA-05**: Bot logs each action (success/skip/fail) to /api/logs
+- [x] **RPA-05**: Bot logs each action (success/skip/fail) to /api/logs
 - [ ] **RPA-06**: Bot takes screenshot and logs error path on failure (Try/Catch)
 - [ ] **RPA-07**: Bot sends summary email after each run (created/updated/duplicates/failed counts)
 
