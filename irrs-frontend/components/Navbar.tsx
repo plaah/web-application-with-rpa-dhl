@@ -46,7 +46,7 @@ export default function Navbar() {
         {navLink("/dashboard", "Dashboard")}
         {navLink("/incidents", "Incidents")}
         {navLink("/upload", "Upload")}
-        {user?.role === "admin" && navLink("/logs", "Logs")}
+        {navLink("/logs", "Logs")}
       </div>
 
       {/* Spacer */}

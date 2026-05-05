@@ -53,3 +53,23 @@ export interface Incident {
   version_history: VersionEntry[];
   ai_suggestions?: AISuggestions;
 }
+
+export interface LogEntry {
+  log_id: string;
+  timestamp: string;
+  run_id: string;
+  action: string;
+  file_name: string | null;
+  incident_id: string | null;
+  status: string;
+  message: string;
+  screenshot_path: string | null;
+}
+
+export interface LogsResponse {
+  success: boolean;
+  data: {
+    logs: LogEntry[];
+    total: number;
+  };
+}
