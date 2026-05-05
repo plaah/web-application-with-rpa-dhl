@@ -9,7 +9,7 @@
 
 - [x] **AUTH-01**: User can log in with username and password
 - [x] **AUTH-02**: Session persists via JWT cookie across browser refresh
-- [ ] **AUTH-03**: Protected routes redirect to /login when not authenticated
+- [x] **AUTH-03**: Protected routes redirect to /login when not authenticated
 - [x] **AUTH-04**: System supports two roles: admin and editor
 
 ### Incidents

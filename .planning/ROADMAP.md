@@ -10,7 +10,7 @@
 
 | # | Phase | Goal | Requirements | Days | Status |
 |---|-------|------|--------------|------|--------|
-| 1 | Web Application | Full CRUD web app with auth, upload, viewer, status workflow | AUTH, INC, VIEW, DASH, API | Days 1–5 (May 4–8) | ◑ In Progress (1/2) |
+| 1 | 2/2 | Complete   | 2026-05-05 | Days 1–5 (May 4–8) | ◑ In Progress (1/2) |
 | 2 | RPA Automation | UiPath bot ingests Drive files, deduplicates, creates/updates incidents via API, sends email | RPA-01–07 | Days 6–8 (May 9–11) | ○ Pending |
 | 3 | AI Enhancement | Claude API integration for text summarization, tag extraction, image OCR | AI-01–03 | Days 9–10 (May 12–13) | ○ Pending |
 | 4 | Polish & Submit | Seed data, README, demo video, report, submission | All | Days 11–15 (May 13–15) | ○ Pending |
@@ -31,7 +31,7 @@
 5. Click "Publish" → status locked, no edit button shown
 6. All 7 API endpoints respond correctly with {success, data} envelope (verifiable via /docs)
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 - [x] `01-01-PLAN.md` — Backend: scaffolding, JWT auth, incidents CRUD, file extraction, reports/logs (Wave 1)
 - [ ] `01-02-PLAN.md` — Frontend: login, dashboard, upload console, incident viewer, incident detail (Wave 2)
 

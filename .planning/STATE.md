@@ -2,13 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-05-05T05:46:25Z"
+status: unknown
+stopped_at: Completed 01-02-PLAN.md (Next.js frontend)
+last_updated: "2026-05-05T06:00:50.029Z"
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State: DHL IRRS
@@ -54,12 +55,16 @@ Plan: 2 of 2
 - check-duplicate route registered before /{incident_id} to avoid FastAPI path conflict
 - bcrypt pinned to 3.2.2 — passlib 1.7.4 incompatible with bcrypt>=4.0
 - anthropic SDK NOT installed in Phase 1; ai.py is empty stub for Phase 3
+- [Phase 01]: irrs_user cookie (JSON) used for client-side role display — no /auth/me endpoint in Phase 1 backend
+- [Phase 01]: Refetch-after-mutation for PATCH status — server as single source of truth, no optimistic updates
+- [Phase 01]: Admin delete gated by getUserFromCookie().role===admin AND incident.status===draft, dual-enforced in UI + server
 
 ## Performance Metrics
 
 | Phase | Plan | Duration (s) | Tasks | Files |
 |-------|------|-------------|-------|-------|
 | 01 | 01 | 283 | 3 | 21 |
+| Phase 01 P02 | 2700 | 5 tasks | 21 files |
 
 ## Open Issues
 
@@ -67,6 +72,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-05T05:46:25Z
-Stopped at: Completed 01-01-PLAN.md (FastAPI backend)
+Last session: 2026-05-05T06:00:42.844Z
+Stopped at: Completed 01-02-PLAN.md (Next.js frontend)
 Next action: Execute Plan 01-02 (Next.js frontend)
