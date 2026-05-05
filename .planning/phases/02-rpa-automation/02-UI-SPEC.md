@@ -1,7 +1,8 @@
 ---
 phase: 2
 slug: rpa-automation
-status: draft
+status: approved
+reviewed_at: 2026-05-05T11:11:00Z
 shadcn_initialized: false
 preset: none
 created: 2026-05-05
