@@ -1,0 +1,1 @@
+Customer reports missing package, DHL waybill 7711-2204-09. Last scan was at JHB sorting facility on 2026-05-02. No further movement events recorded after that timestamp.

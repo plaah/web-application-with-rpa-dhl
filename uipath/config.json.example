@@ -1,0 +1,13 @@
+{
+  "api_base_url": "http://localhost:8000/api",
+  "rpa_username": "rpa_bot",
+  "rpa_password": "rpabot123",
+  "watch_folder": "G:\\My Drive\\irrs-watch",
+  "processed_folder": "G:\\My Drive\\irrs-watch\\processed",
+  "screenshots_folder": "C:\\path\\to\\repo\\uipath\\rpa_screenshots",
+  "email_smtp_host": "smtp.gmail.com",
+  "email_smtp_port": 587,
+  "email_from": "your.gmail@gmail.com",
+  "email_to": "your.gmail@gmail.com",
+  "email_app_password": "xxxx xxxx xxxx xxxx"
+}

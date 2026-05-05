@@ -1,0 +1,1 @@
+Duplicate test fixture — copy this file into the watch folder twice across two bot runs to demonstrate RPA-02 dedup skip path. Content must remain byte-identical between runs.

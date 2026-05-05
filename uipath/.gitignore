@@ -1,0 +1,7 @@
+config.json
+rpa_screenshots/*.png
+watch/processed/*
+!watch/processed/.gitkeep
+.local/
+*.xaml.backup
+project.json.local
