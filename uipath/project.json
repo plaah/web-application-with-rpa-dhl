@@ -1,0 +1,30 @@
+{
+  "name": "DHL_IRRS_RPA",
+  "description": "DHL Incident Reporting & Resolution System — UiPath RPA Bot. Polls a watch folder, deduplicates by SHA-256, creates incidents via IRRS API, advances to reviewed, logs every action, screenshots failures, emails summary.",
+  "projectVersion": "1.0.0",
+  "studioVersion": "23.10.0",
+  "projectType": "Workflow",
+  "targetFramework": "Windows",
+  "main": "Main.xaml",
+  "expressionLanguage": "VisualBasic",
+  "dependencies": {
+    "UiPath.System.Activities": "[23.10.0, )",
+    "UiPath.WebAPI.Activities": "[1.14.0, )",
+    "UiPath.UIAutomation.Activities": "[23.10.0, )",
+    "UiPath.Mail.Activities": "[1.20.0, )"
+  },
+  "webPublishOptions": {
+    "packageName": "DHL_IRRS_RPA"
+  },
+  "designOptions": {
+    "projectProfile": "Attended"
+  },
+  "entryPoints": [
+    {
+      "filePath": "Main.xaml",
+      "uniqueId": "dhl-irrs-rpa-main",
+      "input": [],
+      "output": []
+    }
+  ]
+}

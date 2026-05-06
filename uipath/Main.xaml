@@ -1,0 +1,426 @@
+<Activity
+  mc:Ignorable="sap sap2010 sads"
+  x:Class="DHL_IRRS_RPA.Main"
+  xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+  xmlns:s="clr-namespace:System;assembly=mscorlib"
+  xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
+  xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
+  xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
+  xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+  xmlns:ui="http://schemas.uipath.com/workflow/activities"
+  xmlns:hc="clr-namespace:UiPath.WebAPI.Activities;assembly=UiPath.WebAPI.Activities"
+  xmlns:mail="clr-namespace:UiPath.Mail.SMTP.Activities;assembly=UiPath.Mail.Activities"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <x:Members>
+    <!-- No in/out arguments; all state is local variables -->
+  </x:Members>
+
+  <mva:VisualBasic.Settings>
+    <mva:VisualBasicSettings>
+      <mva:VisualBasicSettings.ImportedNamespaces>
+        <mva:VisualBasicImportReference Assembly="mscorlib" Import="System" />
+        <mva:VisualBasicImportReference Assembly="mscorlib" Import="System.IO" />
+        <mva:VisualBasicImportReference Assembly="mscorlib" Import="System.Text" />
+        <mva:VisualBasicImportReference Assembly="mscorlib" Import="System.Security.Cryptography" />
+        <mva:VisualBasicImportReference Assembly="Newtonsoft.Json" Import="Newtonsoft.Json.Linq" />
+      </mva:VisualBasicSettings.ImportedNamespaces>
+    </mva:VisualBasicSettings>
+  </mva:VisualBasic.Settings>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       ROOT SEQUENCE — DHL IRRS RPA Bot
+       Variables declared here are accessible in all child scopes.
+       ═══════════════════════════════════════════════════════════════ -->
+  <Sequence DisplayName="DHL IRRS RPA Bot — Main">
+    <Sequence.Variables>
+      <!-- Config -->
+      <Variable x:TypeArguments="s:String" Name="configRaw" />
+      <Variable x:TypeArguments="Newtonsoft.Json.Linq.JObject" Name="config" />
+      <!-- Auth -->
+      <Variable x:TypeArguments="s:String" Name="loginResponseText" />
+      <Variable x:TypeArguments="Newtonsoft.Json.Linq.JObject" Name="loginResponse" />
+      <Variable x:TypeArguments="s:String" Name="token" />
+      <!-- Run identity -->
+      <Variable x:TypeArguments="s:String" Name="runId" />
+      <!-- Counters -->
+      <Variable x:TypeArguments="s:Int32" Name="created" Default="0" />
+      <Variable x:TypeArguments="s:Int32" Name="skipped" Default="0" />
+      <Variable x:TypeArguments="s:Int32" Name="failed" Default="0" />
+      <!-- Per-file state -->
+      <Variable x:TypeArguments="s:String" Name="currentFile" />
+      <Variable x:TypeArguments="s:String" Name="fileContent" />
+      <Variable x:TypeArguments="s:String" Name="fileName" />
+      <Variable x:TypeArguments="s:String" Name="titleNoExt" />
+      <Variable x:TypeArguments="s:String" Name="sha256Result" />
+      <Variable x:TypeArguments="s:String" Name="dupResponseText" />
+      <Variable x:TypeArguments="Newtonsoft.Json.Linq.JObject" Name="dupResponse" />
+      <Variable x:TypeArguments="s:Boolean" Name="isDuplicate" />
+      <Variable x:TypeArguments="s:String" Name="createResponseText" />
+      <Variable x:TypeArguments="Newtonsoft.Json.Linq.JObject" Name="createResponse" />
+      <Variable x:TypeArguments="s:String" Name="incidentId" />
+      <Variable x:TypeArguments="s:String" Name="logResponseText" />
+      <Variable x:TypeArguments="s:String" Name="statusResponseText" />
+      <Variable x:TypeArguments="s:String" Name="screenshotPath" />
+      <Variable x:TypeArguments="s:String" Name="summaryBody" />
+    </Sequence.Variables>
+
+    <!-- ═══════════════════════════════════════════════
+         PHASE A — INITIALIZE
+         ═══════════════════════════════════════════════ -->
+    <Sequence DisplayName="Initialize">
+
+      <!-- A1. Read config.json from current directory -->
+      <ui:ReadTextFile DisplayName="Read config.json" FilePath="[Path.Combine(Environment.CurrentDirectory, &quot;config.json&quot;)]" Content="[configRaw]" />
+
+      <!-- A2. Deserialize config JSON -->
+      <ui:DeserializeJSON DisplayName="Deserialize config" Input="[configRaw]" JsonObject="[config]" />
+
+      <!-- A3. Generate run_id -->
+      <Assign DisplayName="Generate run_id">
+        <Assign.To><OutArgument x:TypeArguments="s:String"><Reference><Variable Name="runId" /></Reference></OutArgument></Assign.To>
+        <Assign.Value><InArgument x:TypeArguments="s:String">[Guid.NewGuid().ToString()]</InArgument></Assign.Value>
+      </Assign>
+
+      <!-- A4. Initialise counters -->
+      <Assign DisplayName="Init counters (created=0)">
+        <Assign.To><OutArgument x:TypeArguments="s:Int32"><Reference><Variable Name="created" /></Reference></OutArgument></Assign.To>
+        <Assign.Value><InArgument x:TypeArguments="s:Int32">[0]</InArgument></Assign.Value>
+      </Assign>
+      <Assign DisplayName="Init counters (skipped=0)">
+        <Assign.To><OutArgument x:TypeArguments="s:Int32"><Reference><Variable Name="skipped" /></Reference></OutArgument></Assign.To>
+        <Assign.Value><InArgument x:TypeArguments="s:Int32">[0]</InArgument></Assign.Value>
+      </Assign>
+      <Assign DisplayName="Init counters (failed=0)">
+        <Assign.To><OutArgument x:TypeArguments="s:Int32"><Reference><Variable Name="failed" /></Reference></OutArgument></Assign.To>
+        <Assign.Value><InArgument x:TypeArguments="s:Int32">[0]</InArgument></Assign.Value>
+      </Assign>
+
+      <!-- A5. Ensure processed_folder exists -->
+      <If DisplayName="Create processed_folder if missing"
+          Condition="[Not Directory.Exists(config(&quot;processed_folder&quot;).ToString())]">
+        <If.Then>
+          <ui:CreateDirectory DisplayName="Create processed_folder"
+            Path="[config(&quot;processed_folder&quot;).ToString()]" />
+        </If.Then>
+      </If>
+
+      <!-- A5b. Ensure screenshots_folder exists -->
+      <If DisplayName="Create screenshots_folder if missing"
+          Condition="[Not Directory.Exists(config(&quot;screenshots_folder&quot;).ToString())]">
+        <If.Then>
+          <ui:CreateDirectory DisplayName="Create screenshots_folder"
+            Path="[config(&quot;screenshots_folder&quot;).ToString()]" />
+        </If.Then>
+      </If>
+
+      <!-- A6. Authenticate — POST /api/auth/login -->
+      <hc:HttpRequest DisplayName="POST /api/auth/login"
+        Endpoint="[config(&quot;api_base_url&quot;).ToString() &amp; &quot;/auth/login&quot;]"
+        Method="POST"
+        AcceptFormat="application/json"
+        ContentType="application/json"
+        Body="[&quot;{&quot;&quot;username&quot;&quot;:&quot;&quot;&quot; &amp; config(&quot;rpa_username&quot;).ToString() &amp; &quot;&quot;&quot;,&quot;&quot;password&quot;&quot;:&quot;&quot;&quot; &amp; config(&quot;rpa_password&quot;).ToString() &amp; &quot;&quot;&quot;}&quot;]"
+        Response="[loginResponseText]" />
+
+      <!-- A7. Extract access_token -->
+      <ui:DeserializeJSON DisplayName="Deserialize login response" Input="[loginResponseText]" JsonObject="[loginResponse]" />
+      <Assign DisplayName="Extract access_token">
+        <Assign.To><OutArgument x:TypeArguments="s:String"><Reference><Variable Name="token" /></Reference></OutArgument></Assign.To>
+        <Assign.Value><InArgument x:TypeArguments="s:String">[loginResponse("data")("access_token").ToString()]</InArgument></Assign.Value>
+      </Assign>
+
+    </Sequence>
+
+    <!-- ═══════════════════════════════════════════════
+         PHASE B — FOR EACH FILE
+         Iterates over *.txt in watch_folder.
+         Each file is wrapped in a Try/Catch so one
+         failure does not abort the whole run.
+         ═══════════════════════════════════════════════ -->
+    <ForEach x:TypeArguments="s:String" DisplayName="For Each *.txt in watch_folder"
+      Values="[Directory.GetFiles(config(&quot;watch_folder&quot;).ToString(), &quot;*.txt&quot;)]">
+      <ActivityAction x:TypeArguments="s:String">
+        <ActivityAction.Argument>
+          <DelegateInArgument x:TypeArguments="s:String" Name="currentFile" />
+        </ActivityAction.Argument>
+
+        <!-- Per-file Try/Catch — failure here does NOT abort the loop -->
+        <TryCatch DisplayName="Process file (Try/Catch per file)">
+          <TryCatch.Try>
+            <Sequence DisplayName="Process file — happy path">
+
+              <!-- B1. Read file content -->
+              <ui:ReadTextFile DisplayName="Read file content"
+                FilePath="[currentFile]"
+                Content="[fileContent]" />
+
+              <!-- B2. Extract filename and title -->
+              <Assign DisplayName="Extract fileName">
+                <Assign.To><OutArgument x:TypeArguments="s:String"><Reference><Variable Name="fileName" /></Reference></OutArgument></Assign.To>
+                <Assign.Value><InArgument x:TypeArguments="s:String">[Path.GetFileName(currentFile)]</InArgument></Assign.Value>
+              </Assign>
+              <Assign DisplayName="Extract titleNoExt">
+                <Assign.To><OutArgument x:TypeArguments="s:String"><Reference><Variable Name="titleNoExt" /></Reference></OutArgument></Assign.To>
+                <Assign.Value><InArgument x:TypeArguments="s:String">[Path.GetFileNameWithoutExtension(currentFile)]</InArgument></Assign.Value>
+              </Assign>
+
+              <!-- B3. Compute SHA-256 (UTF-8 bytes -> lowercase hex, matches irrs-backend/utils/dedup.py) -->
+              <ui:InvokeCode DisplayName="Compute SHA256 of fileContent" Language="VisualBasic">
+                <ui:InvokeCode.Arguments>
+                  <InArgument x:TypeArguments="s:String" Name="fileContent">[fileContent]</InArgument>
+                  <OutArgument x:TypeArguments="s:String" Name="sha256_result">[sha256Result]</OutArgument>
+                </ui:InvokeCode.Arguments>
+                <ui:InvokeCode.Code>
+Dim bytes As Byte() = System.Text.Encoding.UTF8.GetBytes(fileContent)
+Dim hash As Byte() = System.Security.Cryptography.SHA256.Create().ComputeHash(bytes)
+sha256_result = System.BitConverter.ToString(hash).Replace("-","").ToLower()
+                </ui:InvokeCode.Code>
+              </ui:InvokeCode>
+
+              <!-- B4. Check duplicate — POST /api/incidents/check-duplicate -->
+              <hc:HttpRequest DisplayName="POST /api/incidents/check-duplicate"
+                Endpoint="[config(&quot;api_base_url&quot;).ToString() &amp; &quot;/incidents/check-duplicate&quot;]"
+                Method="POST"
+                AcceptFormat="application/json"
+                ContentType="application/json"
+                Body="[&quot;{&quot;&quot;content_hash&quot;&quot;:&quot;&quot;&quot; &amp; sha256Result &amp; &quot;&quot;&quot;}&quot;]"
+                Response="[dupResponseText]">
+                <hc:HttpRequest.Headers>
+                  <scg:Dictionary x:TypeArguments="s:String, s:String">
+                    <s:String x:Key="Authorization">[&quot;Bearer &quot; &amp; token]</s:String>
+                  </scg:Dictionary>
+                </hc:HttpRequest.Headers>
+              </hc:HttpRequest>
+
+              <!-- B5. Deserialize dedup response, extract isDuplicate -->
+              <ui:DeserializeJSON DisplayName="Deserialize dedup response" Input="[dupResponseText]" JsonObject="[dupResponse]" />
+              <Assign DisplayName="Extract isDuplicate">
+                <Assign.To><OutArgument x:TypeArguments="s:Boolean"><Reference><Variable Name="isDuplicate" /></Reference></OutArgument></Assign.To>
+                <Assign.Value><InArgument x:TypeArguments="s:Boolean">[CBool(dupResponse("data")("is_duplicate"))]</InArgument></Assign.Value>
+              </Assign>
+
+              <!-- B6. Branch: duplicate skip vs. create -->
+              <If DisplayName="isDuplicate?" Condition="[isDuplicate]">
+
+                <!-- DUPLICATE BRANCH -->
+                <If.Then>
+                  <Sequence DisplayName="Duplicate — skip and log">
+
+                    <!-- B6.T.a. Log skip_duplicate -->
+                    <hc:HttpRequest DisplayName="POST /api/logs (skip_duplicate)"
+                      Endpoint="[config(&quot;api_base_url&quot;).ToString() &amp; &quot;/logs&quot;]"
+                      Method="POST"
+                      AcceptFormat="application/json"
+                      ContentType="application/json"
+                      Body="[&quot;{&quot;&quot;run_id&quot;&quot;:&quot;&quot;&quot; &amp; runId &amp; &quot;&quot;&quot;,&quot;&quot;action&quot;&quot;:&quot;&quot;skip_duplicate&quot;&quot;,&quot;&quot;file_name&quot;&quot;:&quot;&quot;&quot; &amp; fileName &amp; &quot;&quot;&quot;,&quot;&quot;incident_id&quot;&quot;:null,&quot;&quot;status&quot;&quot;:&quot;&quot;skipped&quot;&quot;,&quot;&quot;message&quot;&quot;:&quot;&quot;Duplicate content hash within 14-day window&quot;&quot;,&quot;&quot;screenshot_path&quot;&quot;:null}&quot;]"
+                      Response="[logResponseText]">
+                      <hc:HttpRequest.Headers>
+                        <scg:Dictionary x:TypeArguments="s:String, s:String">
+                          <s:String x:Key="Authorization">[&quot;Bearer &quot; &amp; token]</s:String>
+                        </scg:Dictionary>
+                      </hc:HttpRequest.Headers>
+                    </hc:HttpRequest>
+
+                    <!-- B6.T.b. Increment skipped counter -->
+                    <Assign DisplayName="skipped++">
+                      <Assign.To><OutArgument x:TypeArguments="s:Int32"><Reference><Variable Name="skipped" /></Reference></OutArgument></Assign.To>
+                      <Assign.Value><InArgument x:TypeArguments="s:Int32">[skipped + 1]</InArgument></Assign.Value>
+                    </Assign>
+
+                    <!-- B6.T.c. Move file to processed/ -->
+                    <ui:MoveFile DisplayName="Move to processed/ (skip)"
+                      From="[currentFile]"
+                      To="[Path.Combine(config(&quot;processed_folder&quot;).ToString(), fileName)]" />
+
+                  </Sequence>
+                </If.Then>
+
+                <!-- CREATE BRANCH -->
+                <If.Else>
+                  <Sequence DisplayName="New incident — create, log, advance status">
+
+                    <!-- B6.E.a. POST /api/incidents (multipart/form-data) -->
+                    <!-- Field name for file attachment MUST be "files" (plural) per FastAPI signature -->
+                    <hc:HttpRequest DisplayName="POST /api/incidents (multipart)"
+                      Endpoint="[config(&quot;api_base_url&quot;).ToString() &amp; &quot;/incidents&quot;]"
+                      Method="POST"
+                      AcceptFormat="application/json"
+                      ContentType="multipart/form-data"
+                      Response="[createResponseText]">
+                      <hc:HttpRequest.Headers>
+                        <scg:Dictionary x:TypeArguments="s:String, s:String">
+                          <s:String x:Key="Authorization">[&quot;Bearer &quot; &amp; token]</s:String>
+                        </scg:Dictionary>
+                      </hc:HttpRequest.Headers>
+                      <hc:HttpRequest.BodyParameters>
+                        <scg:Dictionary x:TypeArguments="s:String, s:String">
+                          <s:String x:Key="title">[titleNoExt]</s:String>
+                          <s:String x:Key="description">[fileContent]</s:String>
+                          <s:String x:Key="priority">medium</s:String>
+                          <s:String x:Key="category">other</s:String>
+                          <s:String x:Key="source">rpa</s:String>
+                          <s:String x:Key="content_hash">[sha256Result]</s:String>
+                          <s:String x:Key="raw_content"></s:String>
+                          <s:String x:Key="tags"></s:String>
+                        </scg:Dictionary>
+                      </hc:HttpRequest.BodyParameters>
+                      <hc:HttpRequest.Files>
+                        <scg:List x:TypeArguments="hc:HttpRequestFile">
+                          <hc:HttpRequestFile FieldName="files" FilePath="[currentFile]" />
+                        </scg:List>
+                      </hc:HttpRequest.Files>
+                    </hc:HttpRequest>
+
+                    <!-- B6.E.b. Extract incident_id -->
+                    <ui:DeserializeJSON DisplayName="Deserialize create response" Input="[createResponseText]" JsonObject="[createResponse]" />
+                    <Assign DisplayName="Extract incident_id">
+                      <Assign.To><OutArgument x:TypeArguments="s:String"><Reference><Variable Name="incidentId" /></Reference></OutArgument></Assign.To>
+                      <Assign.Value><InArgument x:TypeArguments="s:String">[createResponse("data")("incident")("id").ToString()]</InArgument></Assign.Value>
+                    </Assign>
+
+                    <!-- B6.E.c. Log create action -->
+                    <hc:HttpRequest DisplayName="POST /api/logs (create)"
+                      Endpoint="[config(&quot;api_base_url&quot;).ToString() &amp; &quot;/logs&quot;]"
+                      Method="POST"
+                      AcceptFormat="application/json"
+                      ContentType="application/json"
+                      Body="[&quot;{&quot;&quot;run_id&quot;&quot;:&quot;&quot;&quot; &amp; runId &amp; &quot;&quot;&quot;,&quot;&quot;action&quot;&quot;:&quot;&quot;create&quot;&quot;,&quot;&quot;file_name&quot;&quot;:&quot;&quot;&quot; &amp; fileName &amp; &quot;&quot;&quot;,&quot;&quot;incident_id&quot;&quot;:&quot;&quot;&quot; &amp; incidentId &amp; &quot;&quot;&quot;,&quot;&quot;status&quot;&quot;:&quot;&quot;success&quot;&quot;,&quot;&quot;message&quot;&quot;:&quot;&quot;Incident created&quot;&quot;,&quot;&quot;screenshot_path&quot;&quot;:null}&quot;]"
+                      Response="[logResponseText]">
+                      <hc:HttpRequest.Headers>
+                        <scg:Dictionary x:TypeArguments="s:String, s:String">
+                          <s:String x:Key="Authorization">[&quot;Bearer &quot; &amp; token]</s:String>
+                        </scg:Dictionary>
+                      </hc:HttpRequest.Headers>
+                    </hc:HttpRequest>
+
+                    <!-- B6.E.d. Advance draft -> reviewed via PATCH /api/incidents/{id}/status -->
+                    <hc:HttpRequest DisplayName="PATCH /api/incidents/{id}/status -> reviewed"
+                      Endpoint="[config(&quot;api_base_url&quot;).ToString() &amp; &quot;/incidents/&quot; &amp; incidentId &amp; &quot;/status&quot;]"
+                      Method="PATCH"
+                      AcceptFormat="application/json"
+                      ContentType="application/json"
+                      Body="[&quot;{&quot;&quot;status&quot;&quot;:&quot;&quot;reviewed&quot;&quot;}&quot;]"
+                      Response="[statusResponseText]">
+                      <hc:HttpRequest.Headers>
+                        <scg:Dictionary x:TypeArguments="s:String, s:String">
+                          <s:String x:Key="Authorization">[&quot;Bearer &quot; &amp; token]</s:String>
+                        </scg:Dictionary>
+                      </hc:HttpRequest.Headers>
+                    </hc:HttpRequest>
+
+                    <!-- B6.E.e. Log status_update action -->
+                    <hc:HttpRequest DisplayName="POST /api/logs (status_update)"
+                      Endpoint="[config(&quot;api_base_url&quot;).ToString() &amp; &quot;/logs&quot;]"
+                      Method="POST"
+                      AcceptFormat="application/json"
+                      ContentType="application/json"
+                      Body="[&quot;{&quot;&quot;run_id&quot;&quot;:&quot;&quot;&quot; &amp; runId &amp; &quot;&quot;&quot;,&quot;&quot;action&quot;&quot;:&quot;&quot;status_update&quot;&quot;,&quot;&quot;file_name&quot;&quot;:&quot;&quot;&quot; &amp; fileName &amp; &quot;&quot;&quot;,&quot;&quot;incident_id&quot;&quot;:&quot;&quot;&quot; &amp; incidentId &amp; &quot;&quot;&quot;,&quot;&quot;status&quot;&quot;:&quot;&quot;success&quot;&quot;,&quot;&quot;message&quot;&quot;:&quot;&quot;Advanced draft -&gt; reviewed&quot;&quot;,&quot;&quot;screenshot_path&quot;&quot;:null}&quot;]"
+                      Response="[logResponseText]">
+                      <hc:HttpRequest.Headers>
+                        <scg:Dictionary x:TypeArguments="s:String, s:String">
+                          <s:String x:Key="Authorization">[&quot;Bearer &quot; &amp; token]</s:String>
+                        </scg:Dictionary>
+                      </hc:HttpRequest.Headers>
+                    </hc:HttpRequest>
+
+                    <!-- B6.E.f. Increment created counter -->
+                    <Assign DisplayName="created++">
+                      <Assign.To><OutArgument x:TypeArguments="s:Int32"><Reference><Variable Name="created" /></Reference></OutArgument></Assign.To>
+                      <Assign.Value><InArgument x:TypeArguments="s:Int32">[created + 1]</InArgument></Assign.Value>
+                    </Assign>
+
+                    <!-- B6.E.g. Move file to processed/ -->
+                    <ui:MoveFile DisplayName="Move to processed/ (created)"
+                      From="[currentFile]"
+                      To="[Path.Combine(config(&quot;processed_folder&quot;).ToString(), fileName)]" />
+
+                  </Sequence>
+                </If.Else>
+
+              </If>
+            </Sequence>
+          </TryCatch.Try>
+
+          <!-- ═══════════════════════════════════════════════
+               CATCH — one file fails, run continues
+               ═══════════════════════════════════════════════ -->
+          <TryCatch.Catches>
+            <Catch x:TypeArguments="s:Exception">
+              <ActivityAction x:TypeArguments="s:Exception">
+                <ActivityAction.Argument>
+                  <DelegateInArgument x:TypeArguments="s:Exception" Name="ex" />
+                </ActivityAction.Argument>
+                <Sequence DisplayName="Error handler — screenshot + log + continue">
+
+                  <!-- Catch.1. Build screenshot path: <screenshots_folder>/<runId>_<fileName>.png -->
+                  <Assign DisplayName="Build screenshotPath">
+                    <Assign.To><OutArgument x:TypeArguments="s:String"><Reference><Variable Name="screenshotPath" /></Reference></OutArgument></Assign.To>
+                    <Assign.Value><InArgument x:TypeArguments="s:String">[Path.Combine(config("screenshots_folder").ToString(), runId &amp; "_" &amp; fileName &amp; ".png")]</InArgument></Assign.Value>
+                  </Assign>
+
+                  <!-- Catch.2. Take screenshot and save to file -->
+                  <!-- TakeScreenshot saves to ScreenshotPath. Requires UiPath.UIAutomation.Activities. -->
+                  <ui:TakeScreenshot DisplayName="Take Screenshot" FileName="[screenshotPath]" />
+
+                  <!-- Catch.3. POST /api/logs (error) with screenshot_path and escaped message -->
+                  <hc:HttpRequest DisplayName="POST /api/logs (error)"
+                    Endpoint="[config(&quot;api_base_url&quot;).ToString() &amp; &quot;/logs&quot;]"
+                    Method="POST"
+                    AcceptFormat="application/json"
+                    ContentType="application/json"
+                    Body="[&quot;{&quot;&quot;run_id&quot;&quot;:&quot;&quot;&quot; &amp; runId &amp; &quot;&quot;&quot;,&quot;&quot;action&quot;&quot;:&quot;&quot;error&quot;&quot;,&quot;&quot;file_name&quot;&quot;:&quot;&quot;&quot; &amp; fileName &amp; &quot;&quot;&quot;,&quot;&quot;incident_id&quot;&quot;:null,&quot;&quot;status&quot;&quot;:&quot;&quot;failed&quot;&quot;,&quot;&quot;message&quot;&quot;:&quot;&quot;&quot; &amp; ex.Message.Replace(&quot;&quot;&quot;&quot;,&quot;&quot;\&quot;&quot;&quot;).Replace(vbCrLf,&quot;&quot;\n&quot;&quot;).Replace(vbLf,&quot;&quot;\n&quot;&quot;) &amp; &quot;&quot;&quot;,&quot;&quot;screenshot_path&quot;&quot;:&quot;&quot;&quot; &amp; screenshotPath &amp; &quot;&quot;&quot;}&quot;]"
+                    Response="[logResponseText]">
+                    <hc:HttpRequest.Headers>
+                      <scg:Dictionary x:TypeArguments="s:String, s:String">
+                        <s:String x:Key="Authorization">[&quot;Bearer &quot; &amp; token]</s:String>
+                      </scg:Dictionary>
+                    </hc:HttpRequest.Headers>
+                  </hc:HttpRequest>
+
+                  <!-- Catch.4. Increment failed counter — do NOT rethrow -->
+                  <Assign DisplayName="failed++">
+                    <Assign.To><OutArgument x:TypeArguments="s:Int32"><Reference><Variable Name="failed" /></Reference></OutArgument></Assign.To>
+                    <Assign.Value><InArgument x:TypeArguments="s:Int32">[failed + 1]</InArgument></Assign.Value>
+                  </Assign>
+
+                </Sequence>
+              </ActivityAction>
+            </Catch>
+          </TryCatch.Catches>
+
+        </TryCatch>
+      </ActivityAction>
+    </ForEach>
+
+    <!-- ═══════════════════════════════════════════════
+         PHASE C — FINALIZE
+         Build summary email and send via Gmail SMTP.
+         ═══════════════════════════════════════════════ -->
+    <Sequence DisplayName="Finalize — send summary email">
+
+      <!-- C1. Build summary email body -->
+      <Assign DisplayName="Build summaryBody">
+        <Assign.To><OutArgument x:TypeArguments="s:String"><Reference><Variable Name="summaryBody" /></Reference></OutArgument></Assign.To>
+        <Assign.Value><InArgument x:TypeArguments="s:String">["DHL IRRS RPA Run Summary" &amp; vbCrLf &amp; "Run ID: " &amp; runId &amp; vbCrLf &amp; "Timestamp: " &amp; DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") &amp; " UTC" &amp; vbCrLf &amp; vbCrLf &amp; "Created: " &amp; created.ToString() &amp; vbCrLf &amp; "Duplicates: " &amp; skipped.ToString() &amp; vbCrLf &amp; "Failed: " &amp; failed.ToString()]</InArgument></Assign.Value>
+      </Assign>
+
+      <!-- C2. Send summary email via Gmail SMTP (port 587 / STARTTLS) -->
+      <mail:SendMail DisplayName="Send SMTP summary email"
+        Server="[config(&quot;email_smtp_host&quot;).ToString()]"
+        Port="[CInt(config(&quot;email_smtp_port&quot;))]"
+        SecureConnection="Auto"
+        UserName="[config(&quot;email_from&quot;).ToString()]"
+        Password="[config(&quot;email_app_password&quot;).ToString()]"
+        To="[config(&quot;email_to&quot;).ToString()]"
+        From="[config(&quot;email_from&quot;).ToString()]"
+        Subject="[&quot;DHL IRRS RPA Run Summary — &quot; &amp; runId]"
+        Body="[summaryBody]"
+        IsBodyHtml="False" />
+
+    </Sequence>
+
+  </Sequence>
+</Activity>
