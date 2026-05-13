@@ -3,12 +3,12 @@
   x:Class="DHL_IRRS_RPA.Main"
   xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
-  xmlns:s="clr-namespace:System;assembly=mscorlib"
+  xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=Microsoft.VisualBasic.Activities"
+  xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib"
   xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
   xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
   xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
-  xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+  xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib"
   xmlns:ui="http://schemas.uipath.com/workflow/activities"
   xmlns:hc="clr-namespace:UiPath.WebAPI.Activities;assembly=UiPath.WebAPI.Activities"
   xmlns:mail="clr-namespace:UiPath.Mail.SMTP.Activities;assembly=UiPath.Mail.Activities"
@@ -20,13 +20,13 @@
 
   <mva:VisualBasic.Settings>
     <mva:VisualBasicSettings>
-      <mva:VisualBasicSettings.ImportedNamespaces>
-        <mva:VisualBasicImportReference Assembly="mscorlib" Import="System" />
-        <mva:VisualBasicImportReference Assembly="mscorlib" Import="System.IO" />
-        <mva:VisualBasicImportReference Assembly="mscorlib" Import="System.Text" />
-        <mva:VisualBasicImportReference Assembly="mscorlib" Import="System.Security.Cryptography" />
+      <mva:VisualBasicSettings.ImportReferences>
+        <mva:VisualBasicImportReference Assembly="System.Private.CoreLib" Import="System" />
+        <mva:VisualBasicImportReference Assembly="System.Private.CoreLib" Import="System.IO" />
+        <mva:VisualBasicImportReference Assembly="System.Private.CoreLib" Import="System.Text" />
+        <mva:VisualBasicImportReference Assembly="System.Security.Cryptography.Algorithms" Import="System.Security.Cryptography" />
         <mva:VisualBasicImportReference Assembly="Newtonsoft.Json" Import="Newtonsoft.Json.Linq" />
-      </mva:VisualBasicSettings.ImportedNamespaces>
+      </mva:VisualBasicSettings.ImportReferences>
     </mva:VisualBasicSettings>
   </mva:VisualBasic.Settings>
 
