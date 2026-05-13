@@ -3,7 +3,7 @@
     "id": "usr-001",
     "username": "admin",
     "email": "admin@dhl.com",
-    "password_hash": "$2b$12$wta.FVIKHankKBLL2UPWruEdDJ5nLYi1vcosebpRvx7piQhJH1wDS",
+    "password_hash": "$2b$12$W48.MzUGdkDAl3zaNXYAfuadK3rCVKzO5s6bYmNF0ziWvb1b1VcZS",
     "role": "admin",
     "created_at": "2026-05-04T00:00:00",
     "is_active": true
@@ -12,7 +12,7 @@
     "id": "usr-002",
     "username": "editor",
     "email": "editor@dhl.com",
-    "password_hash": "$2b$12$bkoCVCp0qmcUxH6SvNgRsuV8b9HdhCc1WhMeBqRto8QQjJhna9Jwm",
+    "password_hash": "$2b$12$nNqgsZNe4pU/LHYNRkoBi.jwiyC54DSTLhYarRQWLNXlkwWNDdHNG",
     "role": "editor",
     "created_at": "2026-05-04T00:00:00",
     "is_active": true
@@ -21,7 +21,7 @@
     "id": "usr-rpa",
     "username": "rpa_bot",
     "email": "rpa@dhl.com",
-    "password_hash": "$2b$12$a1etsYjna3c2AR5dDP4WReJQ44K3DgM.tmmjFREc0orRC71M1./r.",
+    "password_hash": "$2b$12$iC4f1ERRvR5zhxXpbKog/e7UptTejpGVPg7R7hyIrrN0EjJvhgX5G",
     "role": "editor",
     "created_at": "2026-05-04T00:00:00",
     "is_active": true

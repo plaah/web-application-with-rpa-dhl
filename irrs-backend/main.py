@@ -8,7 +8,11 @@ app = FastAPI(title="DHL IRRS API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        # Add your machine's IP if accessing from another device, e.g.:
+        # "http://192.168.x.x:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
