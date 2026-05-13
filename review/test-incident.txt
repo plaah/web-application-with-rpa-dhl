@@ -1,0 +1,11 @@
+DHL Incident Report - Delivery Failure
+
+Date: 2026-05-05
+Location: Kuala Lumpur Distribution Center
+Reference: KL-2026-0501
+
+A delivery truck experienced a mechanical failure on the MRR2 highway causing a delay of approximately 4 hours for 127 parcels destined for the Ampang area. The driver reported unusual engine noise before the breakdown. Emergency maintenance was dispatched and the vehicle was towed to the nearest service center.
+
+Impact: 127 parcels delayed, 3 priority shipments affected
+Priority: High
+Category: Delivery Delay
